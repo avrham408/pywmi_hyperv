@@ -41,12 +41,9 @@ def validate_permission() -> None:
         "(New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent()))"
         ".IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)"
     )
-    if res[0] != 0:
-        raise Exception(f"While trying to check if you is admin"
-                        f" raised error from the powershell command -  {res[0]} error code with stderr: {res[1]}")
-    if res[1] == "True":
+    if res == "True":
         return
-    elif res[1] == "False":
+    elif res == "False":
         pytest.exit("The user your running is not with admin rights the pytest run stoped!")
     else:
         raise Exception(f"validate permission failed the ps "
