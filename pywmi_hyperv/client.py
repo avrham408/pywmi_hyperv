@@ -59,5 +59,5 @@ class Client:
 			raise VmNotFound(f"{vm_name} not found")
 		machine = machine[0]
 		logger.info(f"vm {vm_name} found with guid {machine.Name}")
-		return Vm(self.connection, machine.ElementName, machine.Name, machine)
+		return Vm(self.connection, machine.ElementName, machine.Name.lower())
 
