@@ -42,23 +42,29 @@ class Vm:
             raise UnknownRc from error
 
     def _change_vm_state(self, state: VmState):
-        self._vm_wmi_object.RequestStateChange(state.value)
+        if self.vm_state == state:
+            return
+        response = self._computer_system.RequestStateChange(state.value)
+        try:
+            change_state_response = ChangeVmStateResponse(response[1])
+        except ValueError as error:
+            raise UnknownRc from error
+        if change_state_response == ChangeVmStateResponse.Transition_Started:
+            logger.info(f"Started async job for {state.name} vm")
+            res = wait_for_job_complete(self._client, response[0])
+            if res[0] != 0:
+                raise Exception(f"Change vm state failed with rc {res[0]} and stderr {res[1]}")
+        else:
+            raise NotImplementedError("We only support async job for change vm state for now")
 
     def start_vm(self):
-        pass
-        # job_res, rc = vm.RequestStateChange(state.value)
-        # if rc == RequestedStateRes.Transition_Started.value:  # asyn start
-        #     # check_if_job_succced
-        #     if __handle_job_response(client, job_res):
-        #         return vm
-        # else:
-        #     raise infra_exceptions.ChangeVmStateError(f"RequestStateChange for vm {vm_name} returned with code {rc}")
+        raise NotImplementedError
 
     def stop_vm(self):
-        pass
+        raise NotImplementedError
 
     def create_checkpoint(self):
-        pass
+        raise NotImplementedError
 
     def restore_checkpoint(self):
-        pass
+        raise NotImplementedError
